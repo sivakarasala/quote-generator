@@ -6,14 +6,12 @@ const twitterBtn = document.getElementById("twitter");
 const newQuoteBtn = document.getElementById("new-quote");
 const loader = document.getElementById("loader");
 
-// Show Loading
-function loading() {
+function showLoadingSpinner() {
     loader.hidden = false;
     quoteContainer.hidden = true;
 }
 
-// Hide Loading
-function complete() {
+function removeLoadingSpinner() {
     if(!loader.hidden) {
         quoteContainer.hidden = false;
         loader.hidden = true;
@@ -22,29 +20,31 @@ function complete() {
 
 // Get Quote From API
 async function getQuote() {
+    // We need to use a Proxy URL to make our API call in order to avoid CORS issue
     const proxyUrl = "https://cors-anywhere.herokuapp.com/";
     const apiUrl = "https://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=json";
     try {
-        loading();
+        showLoadingSpinner();
         const response = await fetch(proxyUrl + apiUrl);
         const data = await response.json();
-        // If Author is blank, add "Unknown"
+        // Check if Author field is blank and replace it with "Unknown"
         if(data.quoteAuthor === "") {
             authorText.innerText = "Unknown";
         } else {
             authorText.innerText = data.quoteAuthor;
         }
-        // Reduce font size for long quotes
+        // Dynamically reduce font size for long quotes
         if(data.quoteText.length > 120) {
             quoteText.classList.add("long-quote");
         } else {
             quoteText.classList.remove("long-quote");
         }
         quoteText.innerText = data.quoteText;
-        // Stop Loader, Show Quote
-        complete();
+        removeLoadingSpinner();
     } catch (error) {
-        getQuote();
+        // getQuote();
+        console.log("hara hara mahadeva shambho", error);
+        removeLoadingSpinner();
     }
 }
 
